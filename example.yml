@@ -1,0 +1,51 @@
+_id:
+  $oid: 5e5820fe63fd1849a7096a1e
+className: com.ebay.merch.mfe.dao.
+numericId: 202306051224
+name: ios app
+sites:
+  - 0
+  - 3
+  - 15
+segment: epContext.mappedChannelId == 5
+algos:
+  - REC.SEED
+minResults: 2
+numResults: 10
+template: ''
+lastModifiedBy: hanxiao
+lastModifiedDate:
+  $date: '2023-04-13T18:05:55.617Z'
+extraParams:
+  - name: pp
+    value: '["DedupePostProcessor"]'
+  - name: showEEKItems
+    value: 'true'
+  - name: itm
+    value: '"$(bullseye.LVI)"'
+  - name: dedupe
+    value: '["purchase","sellerListing"]'
+  - name: filterSeed
+    value: '"$(items.notWithSameProductIdThan(additionalItems))"'
+  - name: shortURL
+    value: 'true'
+  - name: active
+    value: 'true'
+  - name: useCatySeed
+    value: 'true'
+  - name: osr
+    value: '500'
+  - name: useActiveSeed
+    value: 'true'
+  - name: tmplRecoTitle
+    value: '"i18n.Tag_SIs"'
+  - name: additionalItems
+    value: '"$(bullseye.LPI)"'
+  - name: excludepp
+    value: '[""]'
+  - name: recoimgsize
+    value: '96'
+type: 1
+version: 2
+productionStatus: PRIMARY
+notes: '123455'

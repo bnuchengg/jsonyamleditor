@@ -1,0 +1,143 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Json Yaml Editor</title>
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="css/jsoneditor.css" rel="stylesheet" type="text/css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jsoneditor.js"></script>
+    <script src="js/js-yaml.js"></script>
+</head>
+<body>
+<div style="margin:5px;">
+    <span>
+        <label for="file">File:&nbsp;</label><input id="file" type="file" style="display: inline">
+    </span>
+    <span>
+        <button class="btn btn-primary" onclick="uploadFile('json');">Upload Json</button>
+        <button class="btn btn-success" onclick="uploadFile('yaml');">Upload Yaml</button>
+    </span>
+</div>
+<div>
+    <div id="jsoneditor" style="width: 45%;float: left;">
+    </div>
+    <div style="float: left;height: 800px;">
+        <div style="height: 45%;">
+        </div>
+        <div>
+            <div style="margin-bottom: 5px;">
+                <button class="btn btn-primary" onclick="jsonToYaml();">Json2Yaml-></button>
+            </div>
+            <div>
+                <button class="btn btn-success" onclick="yamlToJson();"><-Yaml2Json</button>
+            </div>
+        </div>
+    </div>
+    <div id="editor" style="width: 45%;float: left;height: 100%;">
+    </div>
+</div>
+<script>
+    var editor
+    var yamlEditor
+    $(function () {
+        const container = document.getElementById('jsoneditor')
+
+        const options = {
+            mode: 'code',
+            modes: ['code', 'tree']
+        }
+
+        var json = {}
+        $.ajax({
+            url: 'example.json',
+            async: false,
+            success: function (data) {
+                json = data
+            }
+        })
+
+        editor = new JSONEditor(container, options, json)
+
+        yamlEditor = ace.edit("editor");
+        yamlEditor.setTheme("ace/theme/monokai");
+        let yamlString = ""
+        $.ajax({
+            url: 'example.yml',
+            async: false,
+            success: function (data) {
+                yamlString = data
+            }
+        })
+
+        yamlEditor.setSession(ace.createEditSession(yamlString, 'ace/mode/yaml'))
+
+        yamlEditor.on('change', validateYaml)
+    })
+
+    function validateYaml() {
+        try {
+            var flag = true;
+            jsyaml.load(yamlEditor.getValue())
+        } catch (e) {
+            flag = false;
+            yamlEditor.getSession().setAnnotations([{
+                type: 'error',
+                row: e.mark.line,
+                column: e.mark.column,
+                text: e.reason
+            }])
+        } finally {
+            if (flag)
+                yamlEditor.getSession().setAnnotations([])
+        }
+    }
+
+    function uploadFile(fileType) {
+        let text = ""
+        var reader = new FileReader();
+        try {
+            reader.readAsText($('#file')[0].files[0], 'UTF-8');
+            reader.onload = function (e) {
+                var content = e.target.result;
+                text += content;
+                if (fileType == 'json')
+                    try {
+                        editor.set(JSON.parse(text))
+                    } catch (e) {
+                        alert(e)
+                    }
+                else {
+                    yamlEditor.setValue(text)
+                    validateYaml()
+                }
+            }
+        } catch (e) {
+            alert(e)
+        }
+    }
+
+    function jsonToYaml() {
+        var t = editor.getText();
+        if (t)
+            try {
+                var e = JSON.parse(t);
+                yamlEditor.setValue(jsyaml.dump(e))
+            } catch (e) {
+                alert(e)
+            }
+    }
+
+    function yamlToJson() {
+        var t = yamlEditor.getValue();
+        if (t)
+            try {
+                var e = JSON.stringify(jsyaml.load(t), null, 2);
+                editor.setText(e)
+            } catch (e) {
+                alert(e)
+            }
+    }
+
+</script>
+</body>
+</html>
